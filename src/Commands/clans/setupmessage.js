@@ -51,11 +51,18 @@ if(!modalSumbit) return;
 var urlRegex = /^https:\/\/discord\.com\/channels\//;
 await modalSumbit.deferReply({ephemeral:true}).catch((err) => null);
 let ticketurl = await modalSumbit.fields.getField("ticketurl")?.value;
-let embedJson = parseJSON(modalSumbit.fields.getField("embedjson")?.value?.replace(/\s+/g, ''));
+let embedJson = parseJSON(modalSumbit.fields.getField("embedjson")?.value?.replace(/\s+/g, ' '));
 if (!urlRegex.test(ticketurl)) return await modalSumbit.editReply({ embeds: [ new Discord.EmbedBuilder().setColor(defulteColor) .setDescription(language.noturl) ] });
 if(!embedJson || typeof(embedJson) === "string") return await modalSumbit.editReply({ embeds: [ new Discord.EmbedBuilder().setColor(defulteColor) .setDescription(`${language.jsonerror}\n\`\`\`${embedJson}\`\`\``) ] });
 let embed = new Discord.EmbedBuilder(embedJson);
-let msg =  await modalSumbit.editReply({components:[new Discord.ActionRowBuilder().setComponents(
+let msg ;
+if(modalSumbit.replied) msg = await modalSumbit.editReply({components:[new Discord.ActionRowBuilder().setComponents(
+  new Discord.StringSelectMenuBuilder().setCustomId("colorEmbed")
+  .setMaxValues(1)
+  .setPlaceholder(sumbitlist.button.color)
+  .setMaxValues(1)
+  .setOptions({ label: sumbitlist.colors.green, emoji: "🟩", value:"green" }, { label: language.colors.red, emoji: "🟥", value:"red" }, { label: language.colors.gray, emoji: "⬜", value:"gray" }, { label: language.colors.blue, emoji: "🟦", value:"blue" },))] })
+else msg = await modalSumbit.editReply({components:[new Discord.ActionRowBuilder().setComponents(
   new Discord.StringSelectMenuBuilder().setCustomId("colorEmbed")
   .setMaxValues(1)
   .setPlaceholder(sumbitlist.button.color)
